@@ -9,49 +9,13 @@ using namespace std;
 
 class Solution
 {
-    unordered_set<string> map;
-    unordered_map<string, string> trace;
+    unordered_map<string, int> trace;
     queue<string> sq;
-
-    static string mark;
-
-    bool isConnected(const string &a, const string &b)
-    {
-        int count = 0;
-        for (int i = 0; i < a.length(); i++) {
-            if (a[i] != b[i]) {
-                count++;
-            }
-        }
-
-        return count == 1;
-    }
 
     void travel(const string &src, const string &dst)
     {
-        map.insert(dst);
         sq.push(dst);
-        trace[dst] = src;
-    }
-
-    bool isTraveled(const string &a)
-    {
-        const unordered_set<string>::iterator search = map.find(a);
-        return search != map.end();
-    }
-
-    int pathLengthTo(const string &a)
-    {
-        int length = 0;
-
-        string temp = a;
-        do {
-            cout << temp << endl;
-            length ++;
-            temp = trace[temp];
-        } while (temp != mark);
-
-        return length;
+        trace[dst] = trace[src] + 1;
     }
 
 public:
@@ -61,22 +25,28 @@ public:
             return 0;
         }
 
-        dict.insert(start);
         dict.insert(end);
 
-        travel(mark, start);
+        sq.push(start);
+        trace[start] = 1;
 
         while (!sq.empty()) {
             string temp = sq.front();
             sq.pop();
 
-            for (unordered_set<string>::iterator iter = dict.begin(); iter != dict.end(); iter++) {
-                if (!isTraveled(*iter) && isConnected(temp, *iter)) {
-                    travel(temp, *iter);
+            for (int i = 0; i < temp.length(); ++i) {
+                string copy = temp;
+                for (char c = 'a'; c <= 'z'; ++c) {
+                    if (c == temp[i]) continue;
 
-                    if (*iter == end) {
-                        // find it
-                        return pathLengthTo(end);
+                    copy[i] = c;
+
+                    if (dict.count(copy) > 0 && trace.count(copy) == 0) {
+                        travel(temp, copy);
+
+                        if (copy == end) {
+                            return trace[end];
+                        }
                     }
                 }
             }
@@ -85,8 +55,6 @@ public:
         return 0;
     }
 };
-
-string Solution::mark = "";
 
 int main(int argc, char *argv[])
 {
