@@ -16,39 +16,35 @@ public:
         int left = subSearch(A, n, target, Left);
         int right = subSearch(A, n, target, Right);
 
-        vector<int> range;
-        range.push_back(left);
-        range.push_back(right);
-        return range;
+        return {left, right};
     }
 
 private:
     int subSearch(int A[], int n, int target, Mode mode) {
         int l = 0;
         int r = n - 1;
-        int index = -1;
 
-        while (l <= r) {
-            int mid = (l + r) / 2;
-            if (A[mid] == target) {
-                index = mid;
-            }
+        while (l < r) {
             if (Left == mode) {
+                int mid = (l + r) / 2;
                 if (A[mid] < target) {
                     l = mid + 1;
                 } else {
-                    r = mid - 1;
+                    r = mid;
                 }
             }
+            
             if (Right ==  mode) {
+                int mid = (l + r + 1) / 2;
                 if (A[mid] > target) {
                     r = mid - 1;
                 } else {
-                    l = mid + 1;
+                    l = mid;
                 }
             }
         }
-        return index;
+        
+        return A[l] == target ? l : -1;
     }
 };
 
