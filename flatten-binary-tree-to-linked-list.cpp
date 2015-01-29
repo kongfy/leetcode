@@ -19,29 +19,31 @@ public:
     }
 
 private:
-    TreeNode *flattenSub(TreeNode *node)
+    void flattenSub(TreeNode *node)
     {
         if (!node) {
-            return NULL;
+            return;
         }
 
-        TreeNode *left = flattenSub(node->left);
-        TreeNode *right = flattenSub(node->right);
+        TreeNode *left = node->left;
+        TreeNode *right = node->right;
 
-        if (left) {
-            left->right = node->right;
-            node->right = node->left;
+        if (!_tail) {
+            _tail = node;
             node->left = NULL;
+            node->right = NULL;
+        } else {
+            _tail->right = node;
+            _tail = node;
+            node->left = NULL;
+            node->right = NULL;
         }
 
-        if (right) {
-            return right;
-        } else if (left) {
-            return left;
-        } else {
-            return node;
-        }
+        flattenSub(left);
+        flattenSub(right);
     }
+
+    TreeNode *_tail = NULL;
 };
 
 int main(int argc, char *argv[])
