@@ -1,4 +1,5 @@
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -7,20 +8,18 @@ class Solution
 public:
     int maxProfit(vector<int> &prices)
     {
-        vector<int> lowest(prices.size());
+        int n = prices.size();
 
-        for (int i = 0; i < prices.size(); ++i) {
-            if (i == 0) {
-                lowest[i] = prices[i];
-            } else {
-                lowest[i] = min(prices[i], lowest[i - 1]);
-            }
+        if (n == 0) {
+            return 0;
         }
 
         int ans = 0;
+        int lowest = prices[0];
 
         for (int i = 1; i < prices.size(); ++i) {
-            ans = max(prices[i] - lowest[i - 1], ans);
+            ans = max(prices[i] - lowest, ans);
+            lowest = min(prices[i], lowest);
         }
 
         return ans;
