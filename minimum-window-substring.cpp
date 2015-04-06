@@ -1,5 +1,4 @@
 #include <string>
-#include <unordered_set>
 #include <unordered_map>
 #include <iostream>
 
@@ -10,55 +9,51 @@ class Solution
 public:
     string minWindow(string S, string T)
     {
-        unordered_set<char> dict;
-        unordered_map<char, int> count;
-        for (int i = 0; i < T.size(); ++i) {
-            dict.insert(T[i]);
-            if (count.find(T[i]) != count.end()) {
-                count[T[i]]++;
+        unordered_map<char, int> dict;
+
+        int m = T.size();
+        int total = m;
+        for (int i = 0; i < m; ++i) {
+            if (dict.find(T[i]) == dict.end()) {
+                dict[T[i]] = 1;
             } else {
-                count[T[i]] = 1;
+                dict[T[i]]++;
             }
         }
 
-        int l = 0, r = 0;
+        int len = INT_MAX;
         int n = S.size();
-        int m = T.size();
 
-
-        int len = n + 1;
-        int s;
-
+        int l = 0, r = 0;
+        int temp_l = 0;
+        while (l < n && dict.find(S[l]) == dict.end()) l++;
+        r = l;
         while (r < n) {
             if (dict.find(S[r]) != dict.end()) {
-                if (count[S[r]] > 0) {
-                    m--;
-                }
-                count[S[r]]--;
+                if (dict[S[r]] > 0) total--;
+                dict[S[r]]--;
 
-                if (dict.find(S[l]) == dict.end() || count[S[l]] < 0) {
-                    while (l < r) {
-                        if (dict.find(S[l]) != dict.end()) {
-                            if (count[S[l]] >= 0) break;
-                            count[S[l]]++;
-                        }
-                        l++;
+                while (dict.find(S[l]) == dict.end() || dict[S[l]] <0) {
+                    if (dict.find(S[l]) != dict.end()) {
+                        dict[S[l]]++;
+                    }
+                    l++;
+                }
+
+                if (total == 0) {
+                    int t = r - l + 1;
+                    if (t < len) {
+                        temp_l = l;
+                        len = t;
                     }
                 }
-
-                if (m == 0 && r - l + 1 < len) {
-                    len = r - l + 1;
-                    s = l;
-                }
             }
+
             r++;
         }
 
-        if (len > n) {
-            return "";
-        } else {
-            return S.substr(s, len);
-        }
+        if (len == INT_MAX) return "";
+        return S.substr(temp_l, len);
     }
 };
 

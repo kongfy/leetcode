@@ -1,4 +1,5 @@
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -16,25 +17,39 @@ public:
     vector<vector<int> > levelOrder(TreeNode *root)
     {
         vector<vector<int> > ans;
+        if (!root) return ans;
 
-        traval(root, 0, ans);
+        queue<TreeNode *> q;
+        int pre = 1, post = 0;
+        int level = 0;
+        q.push(root);
+        ans.push_back(vector<int> ());
+
+        while (!q.empty()) {
+            TreeNode *node = q.front();
+            q.pop();
+            pre--;
+            ans[level].push_back(node->val);
+
+            if (node->left) {
+                q.push(node->left);
+                post++;
+            }
+            if (node->right) {
+                q.push(node->right);
+                post++;
+            }
+
+            if (!pre && post) {
+                level++;
+                ans.push_back(vector<int> ());
+
+                pre = pre ^ post;
+                post = pre ^ post;
+                pre = pre ^ post;
+            }
+        }
         return ans;
-    }
-
-private:
-    void traval(TreeNode *node, int level, vector<vector<int> > &ans)
-    {
-        if (!node) {
-            return;
-        }
-
-        if (ans.size() < level + 1) {
-            ans.push_back(vector<int>());
-        }
-
-        ans[level].push_back(node->val);
-        traval(node->left, level + 1, ans);
-        traval(node->right, level + 1, ans);
     }
 };
 

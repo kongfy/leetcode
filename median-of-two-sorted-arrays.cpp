@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -7,52 +8,45 @@ class Solution
 public:
     double findMedianSortedArrays(int A[], int m, int B[], int n)
     {
-        if ((m + n) % 2) {
-            return findK(A, 0, m - 1, B, 0, n - 1, (m + n) / 2 + 1);
+        int t = m + n;
+        if (t & 1) {
+            return findKth(A, m, B, n, t / 2 + 1);
         } else {
-            int a = findK(A, 0, m - 1, B, 0, n - 1, (m + n) / 2 + 1);
-            int b = findK(A, 0, m - 1, B, 0, n - 1, (m + n) / 2);
+            int a = findKth(A, m, B, n, t / 2);
+            int b = findKth(A, m, B, n, t / 2 + 1);
             return (a + b) / 2.0;
         }
     }
 
 private:
-    int findK(int A[], int la, int ra, int B[], int lb, int rb, int k)
+    int findKth(int A[], int m, int B[], int n, int k)
     {
-        if (la > ra) {
-            return B[lb + k - 1];
+        if (m  == 0) {
+            return B[k - 1];
         }
 
-        if (lb > rb) {
-            return A[la + k - 1];
+        if (n == 0) {
+            return A[k - 1];
         }
 
+        int mid_a = (m-1) / 2;
+        int mid_b = (n-1) / 2;
 
-        int mida = (la + ra) / 2;
-        int midb = (lb + rb) / 2;
-        int t = mida + 1 - la + midb + 1 - lb;
-
-        if (A[mida] > B[midb]) {
-            if (k > t) {
-                return findK(A, la, ra, B, midb + 1, rb, k - (midb + 1 - lb));
-            } else if (k < t) {
-                return findK(A, la, mida - 1, B, lb, rb, k);
-            } else {
-                if (la == ra) {
-                    return findK(A, la, ra, B, midb + 1, rb, k - (midb + 1 - lb));
-                }
-                return findK(A, la, mida, B, lb, rb, k);
+        if (mid_a + 1 + mid_b + 1 <= k) {
+            if (mid_a + 1 + mid_b + 1 == k && A[mid_a] == B[mid_b]) {
+                return max(A[mid_a], B[mid_b]);
             }
-        } else {
-            if (k > t) {
-                return findK(A, mida + 1, ra, B, lb, rb, k - (mida + 1 - la));
-            } else if (k < t) {
-                return findK(A, la, ra, B, lb, midb - 1, k);
+
+            if (A[mid_a] > B[mid_b]) {
+                return findKth(A, m, B + mid_b + 1, n - mid_b - 1, k - mid_b - 1);
             } else {
-                if (lb == rb) {
-                    return findK(A, mida + 1, ra, B, lb, rb, k - (mida + 1 - la));
-                }
-                return findK(A, la, ra, B, lb, midb, k);
+                return findKth(A + mid_a + 1, m - mid_a - 1, B, n, k - mid_a - 1);
+            }
+        } else if (mid_a + 1 + mid_b + 1 > k) {
+            if (A[mid_a] > B[mid_b]) {
+                return findKth(A, mid_a, B, n, k);
+            } else {
+                return findKth(A, m, B, mid_b, k);
             }
         }
     }

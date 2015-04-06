@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -10,37 +11,42 @@ struct TreeNode {
     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
 };
 
-class Solution {
+class Solution
+{
 public:
     vector<vector<int> > zigzagLevelOrder(TreeNode *root)
     {
         vector<vector<int> > ans;
+        if (!root) return ans;
 
-        travel(root, 1, ans);
+        stack<TreeNode *> s1, s2;
+        s1.push(root);
+        int level = -1;
+
+        while (!s1.empty() || !s2.empty()) {
+            level++;
+            ans.push_back(vector<int> ());
+
+            if (!s1.empty()) {
+                while (!s1.empty()) {
+                    TreeNode *node = s1.top();
+                    s1.pop();
+                    ans[level].push_back(node->val);
+                    if (node->left) s2.push(node->left);
+                    if (node->right) s2.push(node->right);
+                }
+            } else {
+                while (!s2.empty()) {
+                    TreeNode *node = s2.top();
+                    s2.pop();
+                    ans[level].push_back(node->val);
+                    if (node->right) s1.push(node->right);
+                    if (node->left) s1.push(node->left);
+                }
+            }
+        }
 
         return ans;
-    }
-
-private:
-    void travel(TreeNode *node, int level, vector<vector <int> > &ans)
-    {
-        if (!node) {
-            return;
-        }
-
-        vector<int> temp;
-        if (level > ans.size()) {
-            ans.push_back(temp);
-        }
-
-        if (level & 1) {
-            ans[level - 1].push_back(node->val);
-        } else {
-            ans[level - 1].insert(ans[level - 1].begin(), node->val);
-        }
-
-        travel(node->left, level + 1, ans);
-        travel(node->right, level + 1, ans);
     }
 };
 

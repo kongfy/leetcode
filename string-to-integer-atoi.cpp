@@ -1,60 +1,41 @@
 #include <iostream>
-#include <cstdlib>
+#include <cstdio>
 
 using namespace std;
 
-#define INT_MAX 2147483647
-#define INT_MIN -2147483648
-
-class Solution
-{
+class Solution {
 public:
-    int atoi(const char *str)
+    int atoi(string str)
     {
-        long long int absi = 0;
-        char c;
-
-        while (c = *str) {
-            if (' ' == c) {
-                str++;
-            } else {
-                break;
-            }
-        }
+        int l = 0;
+        while (str[l] == ' ') l ++;
 
         int flag = 1;
-        c = *str;
-        if ('+' == c) {
-            flag = 1;
-            str++;
-        } else if ('-' == c) {
+        if (str[l] == '+') l++;
+        else if (str[l] == '-') {
             flag = -1;
-            str++;
+            l++;
         }
 
-        while (c = *str++) {
-            if (c >= '0' && c <= '9') {
-                absi *= 10;
-                absi += c - '0';
-
-                if (flag * absi > INT_MAX) {
-                    return INT_MAX;
-                }
-                if (flag * absi < INT_MIN) {
-                    return INT_MIN;
-                }
-            } else {
-                break;
+        int value = 0;
+        while (str[l] >= '0' && str[l] <= '9') {
+            int digit = str[l++] - '0';
+            if (value > INT_MAX / 10 || (value == INT_MAX / 10 && digit >= 8)) {
+                return flag == 1 ? INT_MAX : INT_MIN;
             }
+
+            value *= 10;
+            value += digit;
         }
-        return flag * absi;
+
+        return flag * value;
     }
 };
 
 int main(int argc, char *argv[])
 {
     Solution solve;
-    char *str = "2147483648";
+    char *str = "123";
 
     cout << atoi(str) << endl;
     cout << solve.atoi(str) << endl;
